@@ -33,15 +33,30 @@ server.get('/api/posts', (req, res) => {
 server.get('/api/posts/:id', (req, res) => {
     const id = req.params.id;
     db.findById(id).then(post => {
-        if(post === 0){
-            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        if(!post){
+            return res.status(404).json({ message: "The post with the specified ID does not exist." })
         } else {
-            res.status(200).json(post)
+            return res.status(200).json(post)
         }
     }).catch(error => {
         res.status(500).json({ message: 'The posts information could not be retrieved.' })
     })
 })
+
+server.delete('/api/posts/:id', (req, res) => {
+    const id = req.params.id;
+    db.remove(id).then(deleted => {
+        if(!deleted){
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        } else {
+            res.status(204).end();
+        }
+    }).catch(error => {
+        res.status(500).json({ message: 'The post could not be removed.' })
+    })
+})
+
+
 
 server.listen(5000, () => {
     console.log('** API is running on port 5k **')
