@@ -83,12 +83,18 @@ router.get('/:id/comments', (req, res) => {
 })
 
 router.post('/:id/comments', (req, res) => {
-    const comment = req.body;
+    let comment = req.body;
+    const id = req.params.id;
+    comment.post_id = id;
 
-    Posts.insertComment(comment).then( commentText => {
-        res.status(201).json(commentText);
-    } ).catch(error => {
-        res.status(500).json({ error: 'The comments information could not be retrieved.' })
+    if (!comment.text){
+        res.status(404).json({ message: "Please provide text in the comment." })
+    }
+    
+    Posts.insertComment(comment).then( banana => {
+            res.status(201).json(comment);
+    }).catch(error => {
+        res.status(500).json({ error: 'There was an error while saving the comment to the database.' })
     })
 })
 
