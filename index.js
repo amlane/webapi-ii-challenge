@@ -70,7 +70,7 @@ server.put('/api/posts/:id', (req, res) => {
             res.status(200).json(updated)
         }
     }).catch(error => {
-        res.status(500).json({ message: 'The post could not be updated.' })
+        res.status(500).json({ message: 'The post information could not be modified.' })
     })
 })
 
