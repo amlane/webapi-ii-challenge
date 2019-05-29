@@ -25,10 +25,10 @@ router.get('/', (req, res) => {
 router.get('/:id', (req, res) => {
     const id = req.params.id;
     Posts.findById(id).then(post => {
-        if(id === 0){ //logic on this line isn't working
-            return res.status(404).json({ message: "The post with the specified ID does not exist." })
+        if(post && post.length){ 
+            res.status(200).json(post)
         } else {
-            return res.status(200).json(post)
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
         }
     }).catch(error => {
         res.status(500).json({ error: 'The posts information could not be retrieved.' })
@@ -72,10 +72,10 @@ router.get('/:id/comments', (req, res) => {
     const id = req.params.id;
     
     Posts.findPostComments(id).then(comments => {
-        if(!comments){
-            res.status(404).json({ message: "The post with the specified ID does not exist." })
-        } else {
+        if(comments && comments.length){
             res.status(200).json(comments)
+        } else {
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
         }
     }).catch(error => {
         res.status(500).json({ error: 'The comments information could not be retrieved.' })
@@ -83,10 +83,10 @@ router.get('/:id/comments', (req, res) => {
 })
 
 router.post('/:id/comments', (req, res) => {
-    const { text } = req.body;
+    const comment = req.body;
 
-    Posts.insertComment({ text }).then( commentText => {
-        res.status(200).json(commentText);
+    Posts.insertComment(comment).then( commentText => {
+        res.status(201).json(commentText);
     } ).catch(error => {
         res.status(500).json({ error: 'The comments information could not be retrieved.' })
     })
