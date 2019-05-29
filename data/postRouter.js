@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
     Posts.insert({ title, contents }).then( newPost => {
         res.status(201).json(newPost);
     }).catch(error => {
-        res.status(500).json({ message: 'There was an error while saving the post to the database.' })
+        res.status(500).json({ error: 'There was an error while saving the post to the database.' })
     })
 })
 
@@ -18,20 +18,20 @@ router.get('/', (req, res) => {
     Posts.find().then( post => {
         res.status(200).json(post)
     }).catch(error => {
-        res.status(500).json({ message: 'The posts information could not be retrieved.' })
+        res.status(500).json({ error: 'The posts information could not be retrieved.' })
     })
 })
 
 router.get('/:id', (req, res) => {
     const id = req.params.id;
     Posts.findById(id).then(post => {
-        if(id === 0){ //logic on this line isn't working
-            return res.status(404).json({ message: "The post with the specified ID does not exist." })
+        if(post && post.length){ 
+            res.status(200).json(post)
         } else {
-            return res.status(200).json(post)
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
         }
     }).catch(error => {
-        res.status(500).json({ message: 'The posts information could not be retrieved.' })
+        res.status(500).json({ error: 'The posts information could not be retrieved.' })
     })
 })
 
@@ -44,7 +44,7 @@ router.delete('/:id', (req, res) => {
             res.status(204).end();
         }
     }).catch(error => {
-        res.status(500).json({ message: 'The post could not be removed.' })
+        res.status(500).json({ error: 'The post could not be removed.' })
     })
 })
 
@@ -64,10 +64,38 @@ router.put('/:id', (req, res) => {
             res.status(200).json(updated)
         }
     }).catch(error => {
-        res.status(500).json({ message: 'The post information could not be modified.' })
+        res.status(500).json({ error: 'The post information could not be modified.' })
     })
 })
 
+router.get('/:id/comments', (req, res) => {
+    const id = req.params.id;
+    
+    Posts.findPostComments(id).then(comments => {
+        if(comments && comments.length){
+            res.status(200).json(comments)
+        } else {
+            res.status(404).json({ message: "The post with the specified ID does not exist." })
+        }
+    }).catch(error => {
+        res.status(500).json({ error: 'The comments information could not be retrieved.' })
+    })
+})
 
+router.post('/:id/comments', (req, res) => {
+    let comment = req.body;
+    const id = req.params.id;
+    comment.post_id = id;
+
+    if (!comment.text){
+        res.status(404).json({ message: "Please provide text in the comment." })
+    }
+    
+    Posts.insertComment(comment).then( banana => {
+            res.status(201).json(comment);
+    }).catch(error => {
+        res.status(500).json({ error: 'There was an error while saving the comment to the database.' })
+    })
+})
 
 module.exports = router;
