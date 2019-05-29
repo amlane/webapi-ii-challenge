@@ -53,11 +53,13 @@ router.put('/:id', (req, res) => {
     const changes = req.body;
     const { title, contents } = req.body;
 
+    if (!title || !contents){
+        return res.status(400).json({ message: "Please provide title and contents for the post." })
+    }
+
     Posts.update(id, changes).then(updated => {
         if(!updated){
             res.status(404).json({ message: "The post with the specified ID does not exist." })
-        } else if (!title || !contents) {
-            res.status(400).json({ message: "Please provide title and contents for the post." })
         } else {
             res.status(200).json(updated)
         }
