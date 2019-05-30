@@ -10,7 +10,7 @@ server.use(helmet());
 server.use(logger);
 
 server.get('/', (req, res) => {
-    res.send('Yo dawg')
+    res.status(200).json({ testMessage: process.env.TEST })
 })
 
 server.use('/api/posts', postRouter);
